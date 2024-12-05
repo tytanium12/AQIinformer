@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-from datetime import datetime
 from fetchCurrent import Fetch
 from timeGraph import AQIVisualizer
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -15,60 +14,63 @@ class WeatherApp:
         self.root.title("AQIinformer")
         self.root.geometry("1000x1000")
 
+        # Default font size for labels
+        self.fontsize = 14
+
         # Default values for latitude and longitude (University of Washington, Seattle Campus, Bagley Hall)
         self.default_lat = 47.65
         self.default_lon = -122.31
 
         # Latitude and Longitude User Inputs
-        self.lat_label = tk.Label(root, text="Latitude:")
+        self.lat_label = tk.Label(root, text="Latitude:", font=("Helvetica", self.fontsize))
         self.lat_label.grid(row=0, column=0, padx=10, pady=0)
-        self.lat_entry = tk.Entry(root)
+        self.lat_entry = tk.Entry(root, font=("Helvetica", self.fontsize))
         self.lat_entry.insert(0, str(self.default_lat))  # Set default latitude value
         self.lat_entry.grid(row=0, column=1, padx=10, pady=0)
 
-        self.lon_label = tk.Label(root, text="Longitude:")
+        self.lon_label = tk.Label(root, text="Longitude:", font=("Helvetica", self.fontsize))
         self.lon_label.grid(row=1, column=0, padx=10, pady=0)
-        self.lon_entry = tk.Entry(root)
+        self.lon_entry = tk.Entry(root, font=("Helvetica", self.fontsize))
         self.lon_entry.insert(0, str(self.default_lon))  # Set default longitude value
         self.lon_entry.grid(row=1, column=1, padx=10, pady=0)
 
         # Button to refresh data
-        self.refresh_button = tk.Button(root, text="Refresh Data", command=self.refresh_data)
+        self.refresh_button = tk.Button(root, text="Refresh Data", command=self.refresh_data, font=("Helvetica", self.fontsize, "bold"))
         self.refresh_button.grid(row=2, column=0, columnspan=1, pady=10, padx=5)
 
         # Button to fetch location
-        self.fetch_button = tk.Button(root, text="Get Current Location", command=self.fetch_location)
+        self.fetch_button = tk.Button(root, text="Get Current Location", command=self.fetch_location, font=("Helvetica", self.fontsize, "bold"))
         self.fetch_button.grid(row=2, column=1, columnspan=1, pady=10, padx=5)
 
         # Labels for displaying current data
-        self.city_label = tk.Label(root, text="Current City:")
+        self.city_label = tk.Label(root, text="Current City:", font=("Helvetica", self.fontsize))
         self.city_label.grid(row=3, column=0, padx=10, pady=0)
-        self.city_value = tk.Label(root, text="")  # Empty label for the current city
+        self.city_value = tk.Label(root, text="", font=("Helvetica", self.fontsize))  # Empty label for the current city
         self.city_value.grid(row=3, column=1, padx=10, pady=0)
 
-        self.time_label = tk.Label(root, text="Current Time:")
+        self.time_label = tk.Label(root, text="Current Time:", font=("Helvetica", self.fontsize))
         self.time_label.grid(row=4, column=0, padx=10, pady=0)
-        self.time_value = tk.Label(root, text="")  # Empty label for the current time
+        self.time_value = tk.Label(root, text="", font=("Helvetica", self.fontsize))  # Empty label for the current time
         self.time_value.grid(row=4, column=1, padx=10, pady=0)
 
-        self.aqi_label = tk.Label(root, text="AQI (Current):")
+        self.aqi_label = tk.Label(root, text="AQI (Current):", font=("Helvetica", self.fontsize))
         self.aqi_label.grid(row=5, column=0, padx=10, pady=0)
-        self.aqi_value = tk.Label(root, text="")  # Empty label for AQI value
+        self.aqi_value = tk.Label(root, text="", font=("Helvetica", self.fontsize))  # Empty label for AQI value
         self.aqi_value.grid(row=5, column=1, padx=10, pady=0)
 
-        self.temp_label = tk.Label(root, text="Temperature:")
+        self.temp_label = tk.Label(root, text="Temperature:", font=("Helvetica", self.fontsize))
         self.temp_label.grid(row=6, column=0, padx=10, pady=0)
-        self.temp_value = tk.Label(root, text="")  # Empty label for temperature
+        self.temp_value = tk.Label(root, text="", font=("Helvetica", self.fontsize))  # Empty label for temperature
         self.temp_value.grid(row=6, column=1, padx=10, pady=0)
 
-        self.precip_label = tk.Label(root, text="Precipitation: \n (past 1 hour)")
+        self.precip_label = tk.Label(root, text="Precipitation: \n (past 1 hour)", font=("Helvetica", self.fontsize))
         self.precip_label.grid(row=7, column=0, padx=10, pady=0)
-        self.precip_value = tk.Label(root, text="")  # Empty label for precipitation
+        self.precip_value = tk.Label(root, text="", font=("Helvetica", self.fontsize))  # Empty label for precipitation
         self.precip_value.grid(row=7, column=1, padx=10, pady=0)
 
-        self.wind_label = tk.Label(root, text="Wind Speed:")
+        self.wind_label = tk.Label(root, text="Wind Speed:", font=("Helvetica", self.fontsize))
         self.wind_label.grid(row=8, column=0, padx=10, pady=0)
-        self.wind_value = tk.Label(root, text="")  # Empty label for wind speed
+        self.wind_value = tk.Label(root, text="", font=("Helvetica", self.fontsize))  # Empty label for wind speed
         self.wind_value.grid(row=8, column=1, padx=10, pady=0)
 
         # Configuring column sizes and weights for best looking interface
@@ -107,7 +109,7 @@ class WeatherApp:
             weather_data = fetch.fetch_weather_data()
 
             # Get current rounded time
-            current_time = fetch.fetch_current_time()
+            current_time = fetch.fetch_rounded_time()
 
             # Find the AQI value closest to the current time
             closest_time_row = aqi_data.iloc[(aqi_data['time'] - current_time).abs().argsort()[:1]]
@@ -122,9 +124,12 @@ class WeatherApp:
             # Get current city
             current_city = fetch.get_city_from_coordinates(lat=latitude, lon=longitude)
 
+            # Get current local time from coordinates
+            local_time = fetch.get_local_time(latitude, longitude)
+
             # Update the labels with the fetched data
             self.city_value.config(text=current_city)
-            self.time_value.config(text=datetime.now().strftime("%m/%d/%Y %I:%M %p"))
+            self.time_value.config(text=local_time.strftime("%m/%d/%Y %I:%M %p"))
             self.aqi_value.config(text=str(aqi_value))
             self.temp_value.config(text=f"{temperature} °F")
             self.precip_value.config(text=f"{precipitation} inches")

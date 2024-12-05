@@ -8,7 +8,7 @@ def fetch_aqi_info(latitude, longitude):
     aqi_data = fetcher.fetch_aqi_data()
 
     # Get the rounded current time
-    rounded_time = fetcher.fetch_current_time()
+    rounded_time = fetcher.fetch_rounded_time()
 
     # Find the AQI value closest to the current rounded time
     closest_time_row = aqi_data.iloc[(aqi_data['time'] - rounded_time).abs().argsort()[:1]]

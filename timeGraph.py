@@ -12,7 +12,7 @@ class AQIVisualizer:
         self.aqi_data = self.fetcher.fetch_aqi_data()
 
         # Get current rounded time
-        self.rounded_time = self.fetcher.fetch_current_time()
+        self.rounded_time = self.fetcher.fetch_rounded_time()
 
         # Select specific time points (e.g., -72, -48, ..., 72 hours)
         self.selected_times = [-72, -48, -24, -8, -3, -1, 0, 1, 3, 8, 24, 48, 72]

@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 from datetime import datetime, timezone
 from geopy.geocoders import Nominatim
+from timezonefinder import TimezoneFinder
+import pytz
 
 # Class that fetches and calculates important information (AQI, AQI color code, weather, time, city from coordinates)
 class Fetch:
@@ -78,7 +80,7 @@ class Fetch:
         except Exception as e:
             return f"Error fetching weather data: {e}"
 
-    def fetch_current_time(self):
+    def fetch_rounded_time(self):
         time_now_GMT = datetime.now(timezone.utc)
         time_now_str = time_now_GMT.strftime("%Y-%m-%d %H:%M:%S")
         time_now_GMT_datetime = datetime.strptime(time_now_str, "%Y-%m-%d %H:%M:%S")
@@ -87,7 +89,7 @@ class Fetch:
 
     def get_city_from_coordinates(self, lat, lon):
         # Initialize the geolocator
-        geolocator = Nominatim(user_agent="aqiInformer_app")
+        geolocator = Nominatim(user_agent="friends_of_aqiInformer_app")
 
         # Create the coordinates string
         coordinates = f"{lat}, {lon}"
@@ -104,3 +106,22 @@ class Fetch:
             return location.raw['address']['village']
         else:
             return "City not found"
+
+    def get_local_time(self, lat, lon):
+        # Initialize TimezoneFinder
+        tf = TimezoneFinder()
+
+        # Find the timezone name based on latitude and longitude
+        timezone_str = tf.timezone_at(lat=lat, lng=lon)
+
+        if timezone_str:
+            # Get the timezone object
+            timezone = pytz.timezone(timezone_str)
+
+            # Get the current time in that timezone
+            current_time = datetime.now(timezone)
+
+            # Return the timezone name and current time in that timezone
+            return current_time#, timezone
+        else:
+            return "Timezone not found"#, None
